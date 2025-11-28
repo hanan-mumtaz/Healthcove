@@ -3,7 +3,7 @@ import {
   Apple, Carrot, ChefHat, Clock, Instagram, Linkedin, Mail, 
   MessageCircle, Twitter, Users, Menu, X
 } from 'lucide-react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 
 import Services from './pages/Services';
 import BookConsultation from './pages/bookconsultation';
