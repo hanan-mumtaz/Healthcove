@@ -1,66 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const auth = require('../middleware/authMiddleware');
-const bcrypt = require('bcryptjs'); 
+const { register, login, getMe } = require('../controllers/authController');
+const { authMiddleware } = require('../middleware/authMiddleware');
 
-// Register Route
-router.post('/register', async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+/**
+ * @route   POST /api/users/register
+ * @desc    Register a new user
+ * @access  Public
+ */
+router.post('/register', register);
 
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
+/**
+ * @route   POST /api/users/login
+ * @desc    Authenticate user & get token
+ * @access  Public
+ */
+router.post('/login', login);
 
-    user = new User({ name, email, password });
-    await user.save();
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1d'
-    });
-
-    res.status(201).json({ token, user: { id: user._id, name, email } });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Login Route
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1d'
-    });
-
-    res.json({ token, user: { id: user._id, name: user.name, email } });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Get User Profile (Protected Route)
-router.get('/me', auth, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select('-password');
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+/**
+ * @route   GET /api/users/me
+ * @desc    Get current user profile
+ * @access  Private
+ */
+router.get('/me', authMiddleware, getMe);
 
 module.exports = router;

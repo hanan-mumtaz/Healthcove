@@ -1,240 +1,212 @@
 import React, { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
-  ChefHat,
+  Baby,
+  Activity,
   Check,
-  ArrowLeft
+  ArrowLeft,
+  Calendar,
+  ShieldCheck,
+  Clock,
+  MessageCircle
 } from "lucide-react";
+import ParticleBackground from "../components/ParticleBackground";
 
-// Small reusable UI components
+/* ───────── UI COMPONENTS ───────── */
+
 const SectionCard = ({ children, className = "" }) => (
-  <div className={`bg-white/70 backdrop-blur-sm rounded-xl p-4 ${className}`}>
+  <div className={`bg-white/70 backdrop-blur-md rounded-2xl p-6 border border-white/40 shadow-xl ${className}`}>
     {children}
   </div>
 );
 
 const PricingCard = ({ plan }) => (
-  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-    <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-    <p className="text-3xl font-bold text-violet-500 mb-6">{plan.price}</p>
-    <ul className="space-y-3 mb-8">
+  <div className={`relative p-8 rounded-3xl backdrop-blur-md transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full ${
+    plan.featured 
+    ? 'bg-white/90 border-2 border-Mg shadow-2xl scale-105 z-10' 
+    : 'bg-white/60 border border-white/40 shadow-xl'
+  }`}>
+    {plan.featured && (
+      <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-Mg to-Lg text-white text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-widest">
+        Most Popular
+      </span>
+    )}
+    <h3 className="text-xl font-bold mb-2 text-slate-900">{plan.name}</h3>
+    <div className="flex items-baseline gap-1 mb-6">
+      <span className="text-3xl font-black text-Mg">{plan.price}</span>
+      <span className="text-sm text-slate-500 font-medium">/session</span>
+    </div>
+    <ul className="space-y-4 mb-8 flex-grow">
       {plan.features.map((feature, idx) => (
-        <li key={idx} className="flex items-center space-x-3">
-          <Check className="w-5 h-5 text-violet-500 flex-shrink-0" />
-          <span>{feature}</span>
+        <li key={idx} className="flex items-start gap-3">
+          <ShieldCheck className="w-5 h-5 text-Lg flex-shrink-0 mt-0.5" />
+          <span className="text-sm text-[#1e3a36] font-medium leading-tight">{feature}</span>
         </li>
       ))}
     </ul>
-    <button className="w-full bg-violet-500 text-white py-3 rounded-xl hover:bg-violet-600 transition-colors">
-      Get Started
-    </button>
+    <Link 
+      to="/bookconsultation"
+      className={`w-full py-4 rounded-2xl font-bold transition-all text-center ${
+        plan.featured 
+        ? 'bg-gradient-to-r from-Mg to-Lg text-white shadow-lg hover:shadow-Mg/30' 
+        : 'bg-white text-Mg border border-Mg/20 hover:bg-Mg hover:text-white'
+      }`}
+    >
+      Book This Slot
+    </Link>
   </div>
 );
 
-const FAQItem = ({ faq }) => (
-  <SectionCard className="p-6">
-    <h3 className="text-xl font-semibold mb-3">{faq.question}</h3>
-    <p className="text-gray-600">{faq.answer}</p>
-  </SectionCard>
-);
+/* ───────── MAIN PAGE ───────── */
 
 function ServiceDetail() {
   const { id } = useParams();
 
-  // Memoized static content (prevents rerendering cost)
-  const service = useMemo(
-    () => ({
-      icon: <ChefHat className="w-20 h-20 text-violet-500" />,
-      title: "Personalized Meal Planning",
-      description:
-        "Our comprehensive meal planning service is designed to help you achieve your health and nutrition goals through customized, delicious, and sustainable meal plans.",
-      image:
-        "https://images.unsplash.com/photo-1466637574441-749b8f19452f?auto=format&fit=crop&q=80&w=2000",
+  // Content is dynamic based on ID, but defaulted to PCOS/Women's health for this example
+  const service = useMemo(() => ({
+    icon: <Activity className="w-20 h-20 text-Mg" />,
+    title: "PCOS & Hormonal Balance",
+    description: "Reclaim your health through a clinical approach to PCOS management that respects your food culture and spiritual values. We focus on insulin sensitivity and hormonal regulation naturally.",
+    image: "https://images.unsplash.com/photo-1511688858344-1855dd36172f?auto=format&fit=crop&q=80&w=2000",
+    
+    benefits: [
+      "Improve Insulin Sensitivity naturally",
+      "Regularize your menstrual cycles",
+      "Sustainable weight management without starvation",
+      "Reduction in Hirsutism and Acne symptoms",
+      "Personalized supplement guidance",
+      "Faith-centered motivation (Tawakkul-based healing)"
+    ],
 
-      benefits: [
-        "Customized meal plans based on your preferences and goals",
-        "Weekly grocery lists with exact quantities",
-        "Easy-to-follow recipes with step-by-step instructions",
-        "Nutritional analysis of each meal",
-        "Flexible plans that adapt to your schedule",
-        "Regular adjustments based on your progress",
-        "Access to our recipe database",
-        "Mobile app integration for easy tracking"
-      ],
+    includes: [
+      "60-min Initial Comprehensive Assessment",
+      "Customized 7-Day Pakistani Meal Plan",
+      "WhatsApp Support for 4 Weeks",
+      "PCOS-friendly Grocery Shopping Guide",
+      "Lifestyle & Sleep Optimization Plan",
+      "Bi-weekly Progress Reviews"
+    ],
 
-      includes: [
-        "Initial consultation and assessment",
-        "Weekly meal plans",
-        "Shopping lists",
-        "Recipe instructions",
-        "Nutritional guidance",
-        "Progress tracking",
-        "24/7 support"
-      ],
+    pricing: [
+      {
+        name: "Quick Consult",
+        price: "Rs. 2,500",
+        features: ["One-time assessment", "PCOS analysis", "Basic supplement advice", "7-day diet outline"]
+      },
+      {
+        name: "Healing Journey",
+        price: "Rs. 7,000",
+        featured: true,
+        features: ["3 Extended Consultations", "Full personalized diet plan", "24/7 WhatsApp support", "Lab report analysis", "Cycle tracking help"]
+      },
+      {
+        name: "Premium Care",
+        price: "Rs. 12,000",
+        features: ["8 Weekly check-ins", "Grocery shopping assistance", "Family meal adjustments", "Sunnah-based detox plan", "Priority WhatsApp access"]
+      }
+    ],
 
-      pricing: [
-        {
-          name: "Basic Plan",
-          price: "$99/month",
-          features: [
-            "Personalized meal plans",
-            "Weekly grocery lists",
-            "Basic recipes",
-            "Email support"
-          ]
-        },
-        {
-          name: "Premium Plan",
-          price: "$199/month",
-          features: [
-            "Everything in Basic",
-            "Advanced recipes",
-            "24/7 chat support",
-            "Monthly consultation",
-            "Custom recipe modifications",
-            "Progress tracking"
-          ]
-        },
-        {
-          name: "Elite Plan",
-          price: "$299/month",
-          features: [
-            "Everything in Premium",
-            "Weekly consultations",
-            "Priority support",
-            "Cooking tutorials",
-            "Restaurant guidance",
-            "Family meal planning"
-          ]
-        }
-      ],
-
-      faqs: [
-        {
-          question: "How customizable are the meal plans?",
-          answer:
-            "Our meal plans are highly customizable and take into account your dietary preferences, restrictions, allergies, and lifestyle factors."
-        },
-        {
-          question: "Can I change my meal plan mid-week?",
-          answer:
-            "Yes, you can modify your meal plan at any time through our platform or by contacting your nutritionist."
-        },
-        {
-          question: "Do you accommodate dietary restrictions?",
-          answer:
-            "Absolutely! We cater to various dietary needs including vegetarian, vegan, gluten-free, dairy-free, and more."
-        }
-      ]
-    }),
-    []
-  );
+    faqs: [
+      {
+        question: "Can PCOS really be managed through diet alone?",
+        answer: "Yes, nutrition is the first line of defense for PCOS. By managing insulin levels through low-GI, culturally relevant foods, we can significantly reduce symptoms."
+      },
+      {
+        question: "Do I have to stop eating roti or rice?",
+        answer: "Absolutely not! I believe in honoring our food culture. We simply learn how to balance our plates and choose the right portions and combinations."
+      }
+    ]
+  }), []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative pt-16">
-      <div className="relative py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 relative pt-24 pb-20">
+      <div className="animated-background" />
+      <ParticleBackground />
 
-          {/* Back Button */}
-          <Link
-            to="/services"
-            className="inline-flex items-center text-violet-500 hover:text-violet-600 mb-8"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Services
-          </Link>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Navigation */}
+        <Link to="/services" className="inline-flex items-center text-Mg font-bold mb-8 hover:translate-x-[-4px] transition-transform">
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to All Programs
+        </Link>
 
-          {/* Hero */}
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
-            <div>
-              <div className="mb-6">{service.icon}</div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                {service.title}
-              </h1>
-              <p className="text-xl text-gray-600 mb-8">
-                {service.description}
-              </p>
-              <button className="bg-gradient-to-r from-violet-500 to-indigo-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                Schedule Consultation
-              </button>
-            </div>
-
-            <img
-              src={service.image}
-              alt={service.title}
-              className="rounded-3xl shadow-2xl"
-            />
-          </div>
-
-          {/* Benefits */}
-          <div className="mb-20">
-            <h2 className="text-3xl font-bold mb-8">Benefits</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {service.benefits.map((benefit, index) => (
-                <SectionCard key={index} className="flex items-start space-x-3">
-                  <Check className="w-5 h-5 text-violet-500 mt-1" />
-                  <span>{benefit}</span>
-                </SectionCard>
-              ))}
+        {/* Hero Section */}
+        <div className="grid lg:grid-cols-2 gap-16 items-center mb-24">
+          <div className="space-y-8">
+            <div className="bg-white/50 w-fit p-4 rounded-3xl shadow-inner border border-white/40">{service.icon}</div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.1]">
+              {service.title}
+            </h1>
+            <p className="text-lg md:text-xl text-[#1e3a36] font-medium leading-relaxed opacity-90">
+              {service.description}
+            </p>
+            <div className="flex flex-wrap gap-4">
+               <div className="flex items-center gap-2 bg-white/40 px-4 py-2 rounded-full border border-white/50 text-xs font-bold text-slate-600">
+                  <Clock className="w-4 h-4 text-Mg" /> 4-12 Weeks Program
+               </div>
+               <div className="flex items-center gap-2 bg-white/40 px-4 py-2 rounded-full border border-white/50 text-xs font-bold text-slate-600">
+                  <MessageCircle className="w-4 h-4 text-Mg" /> WhatsApp Support
+               </div>
             </div>
           </div>
+          <div className="relative group">
+            <div className="absolute -inset-4 bg-gradient-to-r from-Mg to-Lg rounded-[3rem] blur-2xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
+            <img src={service.image} alt={service.title} className="relative rounded-[2.5rem] shadow-2xl border-4 border-white/50 object-cover w-full h-[500px]" />
+          </div>
+        </div>
 
-          {/* Includes */}
-          <SectionCard className="p-12 mb-20 rounded-3xl">
-            <h2 className="text-3xl font-bold mb-8">What's Included</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {service.includes.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-3 bg-violet-50 p-4 rounded-xl"
-                >
-                  <Check className="w-5 h-5 text-violet-500" />
-                  <span>{item}</span>
+        {/* Features Split */}
+        <div className="grid md:grid-cols-2 gap-10 mb-24">
+          <SectionCard>
+            <h2 className="text-2xl font-black mb-8 text-slate-900 border-b border-Mg/10 pb-4">Key Benefits</h2>
+            <div className="space-y-4">
+              {service.benefits.map((benefit, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-full bg-Mg/10 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-Mg" />
+                  </div>
+                  <span className="text-slate-700 font-semibold">{benefit}</span>
                 </div>
               ))}
             </div>
           </SectionCard>
 
-          {/* Pricing */}
-          <div className="mb-20">
-            <h2 className="text-3xl font-bold mb-8 text-center">
-              Pricing Plans
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {service.pricing.map((plan, index) => (
-                <PricingCard key={index} plan={plan} />
+          <SectionCard className="bg-gradient-to-br from-white/90 to-emerald-50/50">
+            <h2 className="text-2xl font-black mb-8 text-slate-900 border-b border-Mg/10 pb-4">What's Included</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {service.includes.map((item, i) => (
+                <div key={i} className="bg-white/50 p-4 rounded-2xl border border-white/50 flex items-center gap-3">
+                  <div className="w-2 h-2 bg-Mg rounded-full"></div>
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">{item}</span>
+                </div>
               ))}
             </div>
-          </div>
-
-          {/* FAQ */}
-          <div className="mb-20">
-            <h2 className="text-3xl font-bold mb-8">Frequently Asked Questions</h2>
-            <div className="space-y-6">
-              {service.faqs.map((faq, index) => (
-                <FAQItem key={index} faq={faq} />
-              ))}
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="bg-gradient-to-r from-violet-500 to-indigo-500 rounded-3xl p-12 text-center text-white">
-            <h2 className="text-3xl font-bold mb-6">Ready to Get Started?</h2>
-            <p className="text-lg mb-8 max-w-2xl mx-auto">
-              Transform your nutrition journey with our personalized meal
-              planning service.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4">
-              <button className="bg-white text-violet-500 px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                Schedule Consultation
-              </button>
-              <button className="border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white hover:text-violet-500 transition-all duration-300">
-                Learn More
-              </button>
-            </div>
-          </div>
-
+          </SectionCard>
         </div>
+
+        {/* Pricing */}
+        <div className="mb-24 text-center">
+          <h2 className="text-3xl md:text-4xl font-black mb-12 text-slate-900">Program Investment</h2>
+          <div className="grid md:grid-cols-3 gap-8 items-stretch">
+            {service.pricing.map((plan, index) => (
+              <PricingCard key={index} plan={plan} />
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ Area */}
+        <div className="max-w-3xl mx-auto">
+           <h2 className="text-3xl font-black mb-10 text-center text-slate-900">Common Concerns</h2>
+           <div className="space-y-6">
+              {service.faqs.map((faq, i) => (
+                <div key={i} className="bg-white/40 backdrop-blur-sm p-8 rounded-3xl border border-white/50">
+                  <h3 className="text-xl font-bold mb-3 text-Mg">{faq.question}</h3>
+                  <p className="text-[#1e3a36] font-medium leading-relaxed">{faq.answer}</p>
+                </div>
+              ))}
+           </div>
+        </div>
+
       </div>
     </div>
   );

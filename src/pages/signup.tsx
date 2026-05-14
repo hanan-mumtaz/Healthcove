@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Mail, Lock, User, } from "lucide-react";
 import API from "../services/api";
 import { SiGoogle } from "react-icons/si";
-import ParticleBackground from '../pages/ParticleBackground';
+import ParticleBackground from '../components/ParticleBackground';
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({

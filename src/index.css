@@ -7,9 +7,14 @@
     scroll-behavior: smooth;
   }
   
-  body {
-    @apply antialiased text-gray-800;
+body {
+    /* Replace text-gray-800 with a deep slate for clarity on green */
+    @apply antialiased text-slate-900; 
   }
+
+  
+
+
 }
 
 @layer components {
@@ -25,7 +30,7 @@
   right: 0;
   bottom: 0;
   z-index: 0;
-  background: linear-gradient(45deg, rgb(221, 229, 227) 0%, rgb(45, 102, 93) 100%);
+background: linear-gradient(45deg, rgb(123, 167, 156) 0%, rgb(54, 121, 111) 100%);
   background-size: 400% 400%;
   animation: gradient 13s ease infinite;
 }

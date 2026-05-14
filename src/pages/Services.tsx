@@ -1,61 +1,64 @@
 import React, { useMemo } from 'react';
-import { ChefHat, Users, Clock, Heart, Brain, Apple } from 'lucide-react';
-import ParticleBackground from './ParticleBackground';
+import { Baby, Activity, Heart, Moon, ClipboardCheck, Smartphone, BookOpen } from 'lucide-react';
+import ParticleBackground from '../components/ParticleBackground';
+import { Link } from 'react-router-dom';
 
 const ICONS = {
-  meal: ChefHat,
-  coaching: Users,
-  health: Heart,
-  education: Brain,
-  weight: Apple,
-  support: Clock,
+  pregnancy: Baby,
+  pcos: Activity,
+  maternal: Heart,
+  prophetic: Moon,
+  assessment: ClipboardCheck,
+  support: Smartphone,
+  guide: BookOpen,
 };
 
 function Services() {
-  // Memoized services so they are not recreated on every render
+  // Memoized services tailored to Areej's specific programs
   const services = useMemo(
     () => [
       {
-        icon: ICONS.meal,
-        title: "Personalized Meal Planning",
+        icon: ICONS.pregnancy,
+        title: "Pregnancy Nutrition Program",
         description:
-          "Custom-tailored nutrition plans that fit your lifestyle, preferences, and health goals. We consider your dietary restrictions, schedule, and cooking abilities.",
-        features: ["Weekly meal plans", "Grocery lists", "Recipe instructions", "Portion guidance"],
+          "Comprehensive nutritional support for expecting mothers to ensure optimal fetal development and maternal well-being.",
+        features: ["Trimester-specific plans", "Fetal growth support", "Nausea & craving mgmt", "Postpartum recovery"],
       },
       {
-        icon: ICONS.coaching,
-        title: "1-on-1 Nutrition Coaching",
+        icon: ICONS.pcos,
+        title: "Women's Health & PCOS",
         description:
-          "Direct access to certified nutritionists who will guide you through your health journey with personalized advice and support.",
-        features: ["Weekly check-ins", "Progress tracking", "Behavioral coaching", "Goal setting"],
+          "Targeted hormonal balance through science-backed nutrition that honors your traditional Pakistani food culture.",
+        features: ["Insulin sensitivity plans", "Hormonal regulation", "Weight management", "Cycle tracking support"],
       },
       {
-        icon: ICONS.health,
-        title: "Health Condition Management",
+        icon: ICONS.maternal,
+        title: "Maternal & Child Nutrition",
         description:
-          "Specialized nutrition programs for managing specific health conditions and achieving optimal wellness.",
-        features: ["Condition-specific plans", "Supplement guidance", "Lifestyle modifications", "Progress monitoring"],
+          "Expert guidance on breastfeeding nutrition and healthy weaning practices for your infant's first 1000 days.",
+        features: ["Lactation support", "First foods (weaning)", "Toddler nutrition", "Anemia prevention"],
       },
       {
-        icon: ICONS.education,
-        title: "Nutrition Education",
+        icon: ICONS.prophetic,
+        title: "Prophetic Medicine & Tibb",
         description:
-          "Learn the science behind nutrition and develop lasting healthy eating habits through our educational programs.",
-        features: ["Online workshops", "Educational resources", "Cooking classes", "Nutrition basics"],
-      },
-      {
-        icon: ICONS.weight,
-        title: "Weight Management",
-        description:
-          "Evidence-based weight management programs focused on long-term, sustainable results.",
-        features: ["Body composition analysis", "Customized meal plans", "Exercise guidance", "Behavioral support"],
+          "Integrating the healing wisdom of Sunnah—like Black Seed and Dates—with modern clinical nutritional science.",
+        features: ["Sunnah-based foods", "Detoxification", "Digestive health", "Faith-centered healing"],
       },
       {
         icon: ICONS.support,
-        title: "24/7 Support System",
+        title: "1-on-1 Virtual Coaching",
         description:
-          "Round-the-clock support to keep you motivated and on track with your nutrition goals.",
-        features: ["Chat support", "Emergency consultations", "Daily motivation", "Community access"],
+          "Direct access to Areej via WhatsApp and video calls for constant motivation and plan adjustments.",
+        features: ["Weekly WhatsApp check-ins", "Progress monitoring", "Cultural food swaps", "24/7 Q&A access"],
+      },
+      {
+        icon: ICONS.guide,
+        title: "Nutrition Guides",
+        description:
+          "Step-by-step digital resources for managing specific health conditions at home. (Launching Soon)",
+        features: ["PCOS Recipe Book", "Pregnancy Checklist", "Islamic Fasting Guide", "Kitchen Makeover"],
+        isComingSoon: true, // Tag for placeholder
       },
     ],
     []
@@ -70,22 +73,27 @@ function Services() {
       <section className="relative py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Our <span className="text-Mg">Services</span>
+            Our <span className="text-Mg">Programs</span>
           </h1>
-          <p className="text-xl text-Dg max-w-3xl mx-auto mb-12">
-            Comprehensive nutrition services tailored to your needs.
-            Experience transformation through expert guidance.
+          <p className="text-xl text-Dg max-w-3xl mx-auto mb-12 italic">
+            "Empowering Pakistani women with faith-centered, culturally rooted, and evidence-based nutrition."
           </p>
 
           {/* SERVICES GRID */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-            {services.map(({ icon: Icon, title, description, features }, index) => (
+            {services.map(({ icon: Icon, title, description, features, isComingSoon }, index) => (
               <div
                 key={index}
-                className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                className={`bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative overflow-hidden ${isComingSoon ? 'border-2 border-dashed border-Mg/30' : ''}`}
               >
+                {isComingSoon && (
+                  <div className="absolute top-4 right-[-35px] bg-Mg text-white text-[10px] font-bold py-1 px-10 rotate-45 shadow-md">
+                    COMING SOON
+                  </div>
+                )}
+                
                 <div className="mb-6 flex justify-center">
-                  <Icon className="w-16 h-16 text-Mg" />
+                  <Icon className={`w-16 h-16 ${isComingSoon ? 'text-gray-400' : 'text-Mg'}`} />
                 </div>
 
                 <h3 className="text-2xl font-semibold mb-4 text-center">{title}</h3>
@@ -94,7 +102,7 @@ function Services() {
                 <ul className="space-y-3">
                   {features.map((feature, i) => (
                     <li key={i} className="flex items-center text-gray-700">
-                      <span className="w-2 h-2 bg-Mg rounded-full mr-3" />
+                      <span className={`w-2 h-2 rounded-full mr-3 ${isComingSoon ? 'bg-gray-300' : 'bg-Mg'}`} />
                       {feature}
                     </li>
                   ))}
@@ -108,15 +116,18 @@ function Services() {
       {/* CTA */}
       <section className="relative py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-12 text-center text-Mg">
-            <h2 className="text-3xl font-bold mb-6">Ready to Start Your Journey?</h2>
-            <p className="text-lg mb-8 max-w-2xl mx-auto">
-              Take the first step toward a healthier lifestyle with our personalized nutrition services.
+          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-12 text-center text-Mg shadow-xl border border-white/50">
+            <h2 className="text-3xl font-bold mb-6">Currently Accepting Limited Clients</h2>
+            <p className="text-lg mb-8 max-w-2xl mx-auto text-Dg">
+              Start your journey today with a personalized nutrition plan that honors your body and your faith.
             </p>
 
-            <button className="bg-gradient-to-r from-Mg to-Lg text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300">
-              Schedule a Consultation
-            </button>
+            <Link 
+              to="/bookconsultation" 
+              className="bg-gradient-to-r from-Mg to-Lg text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 inline-block"
+            >
+              Book a Consultation
+            </Link>
           </div>
         </div>
       </section>
