@@ -4,6 +4,7 @@ import {
   MessageCircle, Twitter, Users, Menu, X, Baby, Activity, Moon, 
   User as UserIcon, Star 
 } from 'lucide-react';
+// ✅ UPDATED: HashRouter is now imported and aliased as Router
 import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 
 import Services from './pages/Services';
@@ -22,7 +23,7 @@ import AdminLayout from './components/AdminLayout';
 import AdminBlogs from './Admin/AdminBlog';
 import AdminDashboard from './Admin/AdminDashboard';
 import AdminAppointments from './Admin/AdminAppointments';
-import { AuthProvider, useAuth } from './Authenticator/AuthContext'; // Updated import
+import { AuthProvider, useAuth } from './Authenticator/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import AuthContext from "./Authenticator/AuthContext";
 import AuthSuccess from './pages/AuthSuccess';
@@ -77,7 +78,6 @@ const [reviews, setReviews] = useState<any[]>([]);
     const fetchHomeReviews = async () => {
       try {
         const res = await API.get('/reviews');
-        // Filter approved reviews and show up to 6
         const approved = res.data.filter((r: any) => r.status === 'approved');
         setReviews(approved.slice(0, 6));
       } catch (err) {
@@ -143,7 +143,6 @@ const [reviews, setReviews] = useState<any[]>([]);
         reviews.map((rev: any) => (
           <div key={rev._id} className="p-6 rounded-2xl bg-white/70 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
             <div className="flex items-center mb-4">
-              {/* Profile Image with fallback to Initial */}
               <div className="w-12 h-12 rounded-full overflow-hidden bg-Mg/20 flex items-center justify-center text-Mg font-bold border border-white">
                 {rev.picture ? (
                   <img 
@@ -252,7 +251,6 @@ const Navigation = ({ isScrolled, isMobileMenuOpen, toggleMobileMenu, setIsMobil
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white/95 backdrop-blur-xl blur-mobile absolute top-16 left-0 w-full shadow-lg border-t border-gray-100">
           <div className="px-4 pt-4 pb-6 space-y-4 flex flex-col items-center">
-            {/* Mobile Links */}
             <Link to="/" onClick={toggleMobileMenu} className="text-lg font-medium text-Dg hover:text-Mg">Home</Link>
             <Link to="/services" onClick={toggleMobileMenu} className="text-lg font-medium text-Dg hover:text-Mg">Services</Link>
             <Link to="/about" onClick={toggleMobileMenu} className="text-lg font-medium text-Dg hover:text-Mg">About</Link>
@@ -307,6 +305,7 @@ function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
+        {/* ✅ HashRouter is used here via the aliased Router import */}
         <Router>
           <ScrollToTop />
           <AppContent 
@@ -323,10 +322,9 @@ function App() {
 
 const AppContent = ({ isScrolled, isMobileMenuOpen, toggleMobileMenu, setIsMobileMenuOpen }) => {
   const location = useLocation();
-  const { user, loading } = useAuth(); // Hook instead of Consumer
+  const { user, loading } = useAuth();
   const isAdminPath = location.pathname.startsWith('/admin');
 
-  // ✅ AUTH GUARD: Prevent redirecting to Sign In while verifying session
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-violet-50">
@@ -380,7 +378,6 @@ const AppContent = ({ isScrolled, isMobileMenuOpen, toggleMobileMenu, setIsMobil
         <footer className="bg-white/10 text-slate-900 py-16 backdrop-blur-sm border-t border-white/20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 items-start text-left">
-              {/* Footer columns... (maintained design) */}
               <div className="flex flex-col space-y-4">
                 <div className="flex items-center -mt-2 h-10"> 
                   <img loading="lazy" src={logo} alt="HealthCove" className="w-40 h-auto object-contain object-left" />
