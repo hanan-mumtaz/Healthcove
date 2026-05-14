@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Lock, User, } from "lucide-react";
-import API from "../services/api";
+import API, { AUTH_BASE_URL } from "../services/api";
 import { SiGoogle } from "react-icons/si";
 import ParticleBackground from '../components/ParticleBackground';
 
@@ -39,7 +39,7 @@ const SignUp: React.FC = () => {
       });
 
       localStorage.setItem("token", response.data.token);
-      window.location.href = "/"; // Redirect to homepage after signup
+      window.location.href = `${import.meta.env.BASE_URL}#/`; // Redirect to homepage after signup
     } catch (err: any) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -137,7 +137,7 @@ const SignUp: React.FC = () => {
   disabled={googleLoading}
   onClick={() => {
     setGoogleLoading(true);
-    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
+    window.location.href = `${AUTH_BASE_URL}/google`;
   }}
 >
   {googleLoading ? (

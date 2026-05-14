@@ -1,8 +1,5 @@
 import React, { createContext, useState, useEffect, ReactNode, useContext } from "react";
-import axios from "axios";
 import API from "../services/api";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 interface User {
   id: string;
   name?: string;        // Optional because Google might use displayName
@@ -18,7 +15,7 @@ interface AuthContextType {
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
   logout: () => void;
-  login: (userData: User, token: string) => Promise<void>; 
+  login: (userData: Partial<User>, token: string) => Promise<void>; 
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -66,7 +63,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (res.data) {
         // Support both { user: {} } and direct {} response structures
         const userData = res.data.user || res.data;
-        setUser(userData);
+        setUser(userData as User);
         localStorage.setItem("user", JSON.stringify(userData));
       }
     } catch (err: any) {
@@ -82,7 +79,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const login = async (userData: any, token: string) => {
+  const login = async (userData: Partial<User>, token: string) => {
     console.log("DEBUG: Google User Data Received ->", userData);
     // 1. Persist to storage
     localStorage.setItem("token", token);
@@ -92,7 +89,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
     // 3. Update state
-    setUser(userData);
+    setUser(userData as User);
     setLoading(false);
     
     // 4. Verification Sync in background
@@ -122,19 +119,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        await axios.post(`${API_URL}/api/auth/logout`, {}, { 
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      } catch (error) {
-        console.error("Logout error:", error);
-      }
+    try {
+      await API.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout error:", error);
     }
     handleLogoutLogic();
     // Redirect to home and refresh to clear any leftover state in memory
-    window.location.href = "/";
+    window.location.href = `${import.meta.env.BASE_URL}#/`;
   };
 
   return (

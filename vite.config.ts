@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-    base: '', // required for GitHub Pages
+    base: '/Healthcove/', // required for GitHub Pages
 
   optimizeDeps: {
     exclude: ['lucide-react'],

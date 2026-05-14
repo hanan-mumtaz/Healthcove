@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
-import API from "../services/api"; // Relative import (Correct)
+import API, { AUTH_BASE_URL } from "../services/api";
 import ParticleBackground from '../components/ParticleBackground';
 import { useAuth } from '../Authenticator/AuthContext';
 
@@ -15,11 +15,11 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -44,7 +44,7 @@ const SignIn = () => {
       } else {
         navigate('/');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Login Error:", err);
       // Display specific backend error or a generic fallback
       setError(err.response?.data?.message || 'Invalid email or password. Please try again.');
@@ -100,7 +100,7 @@ const SignIn = () => {
               <input type="checkbox" className="mr-2" />
               <span className="text-sm text-gray-600">Remember me</span>
             </label>
-            <Link to="/forgot-password" virtual="true" className="text-sm text-Lg hover:underline">
+            <Link to="/forgot-password" className="text-sm text-Lg hover:underline">
               Forgot Password?
             </Link>
           </div>
@@ -125,7 +125,7 @@ const SignIn = () => {
             className="w-full flex items-center justify-center bg-white text-black px-8 py-3 rounded-lg font-semibold border border-Lg hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50"
             style={{ maxWidth: "100%" }}
             onClick={() => {
-              window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
+                window.location.href = `${AUTH_BASE_URL}/google`;
             }}
           >
             <div className="gsi-material-button-icon">
