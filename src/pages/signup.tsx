@@ -32,8 +32,8 @@ const SignUp: React.FC = () => {
     }
 
     try {
-      const response = await API.post("/auth/register", {
-        name: formData.name,
+    const response = await API.post("/users/register", {
+          name: formData.name,
         email: formData.email,
         password: formData.password,
       });

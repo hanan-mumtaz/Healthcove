@@ -25,8 +25,7 @@ const SignIn = () => {
     setError('');
 
     try {
-      const response = await API.post('/auth/login', formData);
-      
+const response = await API.post('/users/login', formData);      
       // ✅ Defensive destructuring in case backend wraps response in 'data' or 'user'
       const responseData = response.data.user ? response.data : (response.data.data || response.data);
       const { user, token } = responseData;
