@@ -37,9 +37,9 @@ API.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('user'); 
 
-      // Redirect to login if not already there
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
+      // Redirect to the sign-in route used by the HashRouter app
+      if (!window.location.hash.includes('#/signin')) {
+        window.location.href = `${import.meta.env.BASE_URL}#/signin`;
       }
     }
     return Promise.reject(error);

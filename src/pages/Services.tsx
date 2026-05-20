@@ -1,68 +1,102 @@
-import React, { useMemo } from 'react';
-import { Baby, Activity, Heart, Moon, ClipboardCheck, Smartphone, BookOpen } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Baby, Activity, Heart, Moon, Smartphone, BookOpen, Sparkles } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
 import { Link } from 'react-router-dom';
+import API from '../services/api';
 
 const ICONS = {
   pregnancy: Baby,
   pcos: Activity,
   maternal: Heart,
   prophetic: Moon,
-  assessment: ClipboardCheck,
   support: Smartphone,
   guide: BookOpen,
+  lifestyle: Sparkles,
 };
 
 function Services() {
-  // Memoized services tailored to Areej's specific programs
-  const services = useMemo(
-    () => [
+  const [services, setServices] = useState<any[]>(() => {
+    // ✅ Initialize with fallback data for instant render (no loading spinner)
+    return [
       {
-        icon: ICONS.pregnancy,
-        title: "Pregnancy Nutrition Program",
-        description:
-          "Comprehensive nutritional support for expecting mothers to ensure optimal fetal development and maternal well-being.",
-        features: ["Trimester-specific plans", "Fetal growth support", "Nausea & craving mgmt", "Postpartum recovery"],
+        iconKey: 'pregnancy',
+        title: 'Pregnancy Nutrition Program',
+        description: 'Comprehensive nutritional support for expecting mothers to ensure optimal fetal development and maternal well-being.',
+        features: ['Trimester-specific plans', 'Fetal growth support', 'Nausea and craving management', 'Postpartum recovery'],
       },
       {
-        icon: ICONS.pcos,
-        title: "Women's Health & PCOS",
-        description:
-          "Targeted hormonal balance through science-backed nutrition that honors your traditional Pakistani food culture.",
-        features: ["Insulin sensitivity plans", "Hormonal regulation", "Weight management", "Cycle tracking support"],
+        iconKey: 'pcos',
+        title: "Women's Health and PCOS",
+        description: 'Targeted hormonal balance through science-backed nutrition that honors your traditional Pakistani food culture.',
+        features: ['Insulin sensitivity plans', 'Hormonal regulation', 'Weight management', 'Cycle tracking support'],
       },
       {
-        icon: ICONS.maternal,
-        title: "Maternal & Child Nutrition",
-        description:
-          "Expert guidance on breastfeeding nutrition and healthy weaning practices for your infant's first 1000 days.",
-        features: ["Lactation support", "First foods (weaning)", "Toddler nutrition", "Anemia prevention"],
+        iconKey: 'maternal',
+        title: 'Maternal and Child Nutrition',
+        description: 'Expert guidance on breastfeeding nutrition and healthy weaning practices for your infant\'s first 1000 days.',
+        features: ['Lactation support', 'First foods for weaning', 'Toddler nutrition', 'Anemia prevention'],
       },
       {
-        icon: ICONS.prophetic,
-        title: "Prophetic Medicine & Tibb",
-        description:
-          "Integrating the healing wisdom of Sunnah—like Black Seed and Dates—with modern clinical nutritional science.",
-        features: ["Sunnah-based foods", "Detoxification", "Digestive health", "Faith-centered healing"],
+        iconKey: 'prophetic',
+        title: 'Prophetic Medicine and Tibb',
+        description: 'Integrating the healing wisdom of Sunnah, like black seed and dates, with modern clinical nutritional science.',
+        features: ['Sunnah-based foods', 'Digestive health', 'Faith-centered healing', 'Lifestyle guidance'],
       },
       {
-        icon: ICONS.support,
-        title: "1-on-1 Virtual Coaching",
-        description:
-          "Direct access to Areej via WhatsApp and video calls for constant motivation and plan adjustments.",
-        features: ["Weekly WhatsApp check-ins", "Progress monitoring", "Cultural food swaps", "24/7 Q&A access"],
+        iconKey: 'support',
+        title: '1-on-1 Virtual Coaching',
+        description: 'Direct access to Areej via WhatsApp and video calls for constant motivation and plan adjustments.',
+        features: ['Weekly WhatsApp check-ins', 'Progress monitoring', 'Cultural food swaps', 'Follow-up support'],
       },
       {
-        icon: ICONS.guide,
-        title: "Nutrition Guides",
-        description:
-          "Step-by-step digital resources for managing specific health conditions at home. (Launching Soon)",
-        features: ["PCOS Recipe Book", "Pregnancy Checklist", "Islamic Fasting Guide", "Kitchen Makeover"],
-        isComingSoon: true, // Tag for placeholder
+        iconKey: 'lifestyle',
+        title: 'Weight Management and Lifestyle Reset',
+        description: 'Practical support for sustainable fat loss, habit building, and long-term routine changes that fit real life.',
+        features: ['Personalized meal structure', 'Sustainable fat loss', 'Habit tracking', 'Progress reviews'],
       },
-    ],
+    ];
+  });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // ✅ Fetch API data in the background (non-blocking)
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        const res = await API.get('/services?public=true');
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setServices(res.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch services, using fallback', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  const fallbackServices = useMemo(
+    () => [],
     []
   );
+
+  const visibleServices = services;
+
+  const resolveIcon = (iconKey: string) => {
+    const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+      pregnancy: ICONS.pregnancy,
+      pcos: ICONS.pcos,
+      maternal: ICONS.maternal,
+      prophetic: ICONS.prophetic,
+      support: ICONS.support,
+      guide: ICONS.guide,
+      lifestyle: ICONS.lifestyle,
+    };
+
+    return iconMap[iconKey] || ICONS.lifestyle;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative pt-16">
@@ -81,34 +115,36 @@ function Services() {
 
           {/* SERVICES GRID */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-            {services.map(({ icon: Icon, title, description, features, isComingSoon }, index) => (
-              <div
-                key={index}
-                className={`bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative overflow-hidden ${isComingSoon ? 'border-2 border-dashed border-Mg/30' : ''}`}
+            {visibleServices.map((service, index) => {
+              const Icon = resolveIcon(service.iconKey);
+
+              return (
+              <Link
+                key={service._id || index}
+                to={`/services/${service._id || ''}`}
+                className="group block bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
               >
-                {isComingSoon && (
-                  <div className="absolute top-4 right-[-35px] bg-Mg text-white text-[10px] font-bold py-1 px-10 rotate-45 shadow-md">
-                    COMING SOON
-                  </div>
-                )}
-                
                 <div className="mb-6 flex justify-center">
-                  <Icon className={`w-16 h-16 ${isComingSoon ? 'text-gray-400' : 'text-Mg'}`} />
+                  <Icon className="w-16 h-16 text-Mg" />
                 </div>
 
-                <h3 className="text-2xl font-semibold mb-4 text-center">{title}</h3>
-                <p className="text-gray-600 mb-6 text-center">{description}</p>
+                <h3 className="text-2xl font-semibold mb-4 text-center">{service.title}</h3>
+                <p className="text-gray-600 mb-6 text-center">{service.description}</p>
 
                 <ul className="space-y-3">
-                  {features.map((feature, i) => (
+                  {service.features.map((feature: string, i: number) => (
                     <li key={i} className="flex items-center text-gray-700">
-                      <span className={`w-2 h-2 rounded-full mr-3 ${isComingSoon ? 'bg-gray-300' : 'bg-Mg'}`} />
+                      <span className="w-2 h-2 rounded-full mr-3 bg-Mg" />
                       {feature}
                     </li>
                   ))}
                 </ul>
-              </div>
-            ))}
+                <div className="mt-8 text-center text-sm font-bold text-Mg opacity-0 group-hover:opacity-100 transition-opacity">
+                  View details →
+                </div>
+              </Link>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Calendar,
   User,
@@ -10,46 +10,91 @@ import {
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import ParticleBackground from "../components/ParticleBackground";
-
-// ----------------------------
-// Static Post Data (moves out of component for optimization)
-// ----------------------------
-const POST_DATA = {
-  title: "The Science Behind Intuitive Eating",
-  content: `
-    <h2>Understanding Your Body's Signals</h2>
-    <p>Intuitive eating is a framework that helps you tune into your body's natural hunger and fullness signals...</p>
-
-    <h2>The Ten Principles of Intuitive Eating</h2>
-    <p>1. Reject the Diet Mentality<br>2. Honor Your Hunger<br>3. Make Peace with Food...</p>
-  `,
-  image:
-    "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&q=80&w=2000",
-  date: "March 15, 2024",
-  author: "Dr. Sarah Johnson",
-  readTime: "8 min read",
-  category: "Nutrition Science",
-  tags: ["Intuitive Eating", "Mental Health", "Nutrition", "Wellness"],
-  relatedPosts: [
-    {
-      title: "Understanding Macronutrients",
-      image:
-        "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=800",
-      date: "March 12, 2024",
-    },
-    {
-      title: "Mindful Eating Practices",
-      image:
-        "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&q=80&w=800",
-      date: "March 10, 2024",
-    },
-  ],
-};
+import API from "../services/api";
 
 function SingleBlog() {
-  useParams(); // Only needed to trigger route match, no performance issue
+  const { id } = useParams();
+  const [post, setPost] = useState<any | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const post = POST_DATA;
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!id) {
+        setError('Missing article identifier.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const [postResponse, listResponse] = await Promise.all([
+          API.get(`/blogs/${id}?public=true`),
+          API.get('/blogs?public=true'),
+        ]);
+
+        const fetchedPost = postResponse.data;
+        setPost(fetchedPost);
+
+        const related = Array.isArray(listResponse.data)
+          ? listResponse.data.filter((item: any) => item._id !== fetchedPost._id && item.category === fetchedPost.category).slice(0, 2)
+          : [];
+
+        setRelatedPosts(related);
+      } catch (err) {
+        console.error('Failed to load blog article', err);
+        setError('This article could not be loaded right now.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [id]);
+
+  const tags = useMemo(() => {
+    if (!post) return [];
+    if (Array.isArray(post.tags) && post.tags.length > 0) return post.tags;
+    return post.category ? [post.category] : [];
+  }, [post]);
+
+  const handleShare = (platform: 'facebook' | 'twitter' | 'linkedin') => {
+    if (!post) return;
+    const url = window.location.href;
+    const title = post.title;
+    const shareUrls = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+    };
+
+    window.open(shareUrls[platform], '_blank', 'noopener,noreferrer');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative pt-16 flex items-center justify-center">
+        <ParticleBackground />
+        <div className="relative z-10 text-slate-700 font-medium">Loading article...</div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative pt-16 flex items-center justify-center">
+        <ParticleBackground />
+        <div className="relative z-10 max-w-xl mx-auto px-4 text-center">
+          <h1 className="text-3xl font-bold text-slate-900 mb-4">Article unavailable</h1>
+          <p className="text-slate-600 mb-8">{error || 'The requested article could not be found.'}</p>
+          <Link to="/blog" className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-gradient-to-r from-Mg to-Lg text-white font-bold">
+            Back to Blog
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative pt-16">
@@ -80,39 +125,41 @@ function SingleBlog() {
           <div className="flex flex-wrap items-center text-Dg gap-4 mt-4">
             <span className="flex items-center">
               <User className="w-4 h-4 mr-2" />
-              {post.author}
+              {post.author?.name || post.author?.displayName || 'Areej Fatima'}
             </span>
 
             <span className="flex items-center">
               <Calendar className="w-4 h-4 mr-2" />
-              {post.date}
+              {new Date(post.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
             </span>
 
             <span className="flex items-center">
               <Clock className="w-4 h-4 mr-2" />
-              {post.readTime}
+              {post.readTime || '5 min read'}
             </span>
           </div>
         </div>
 
         {/* Image */}
         <div className="rounded-3xl overflow-hidden shadow-xl mb-10">
-          <img
-            src={post.image}
-            alt={post.title}
-            className="w-full h-[450px] object-cover"
-            loading="lazy"
-          />
+          {post.image ? (
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-[450px] object-cover"
+              loading="lazy"
+            />
+          ) : null}
         </div>
 
         {/* Content */}
         <div className="prose prose-lg max-w-none text-Dg mb-10">
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div className="whitespace-pre-line leading-8 text-lg">{post.content}</div>
         </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-10">
-          {post.tags.map((tag) => (
+          {tags.map((tag: string) => (
             <span
               key={tag}
               className="bg-violet-100 text-Lg px-3 py-1 rounded-full text-sm"
@@ -127,9 +174,15 @@ function SingleBlog() {
           <span className="text-Dg">Share this article:</span>
 
           <div className="flex space-x-4">
-            {[Facebook, Twitter, Linkedin].map((Icon) => (
+            {[
+              { Icon: Facebook, platform: 'facebook' as const },
+              { Icon: Twitter, platform: 'twitter' as const },
+              { Icon: Linkedin, platform: 'linkedin' as const },
+            ].map(({ Icon, platform }) => (
               <button
-                key={Icon.name}
+                key={platform}
+                type="button"
+                onClick={() => handleShare(platform)}
                 className="text-Dg hover:text-Lg transition-colors"
               >
                 <Icon className="w-5 h-5" />
@@ -142,39 +195,30 @@ function SingleBlog() {
         <h2 className="text-2xl text-Dg font-semibold mb-6">Related Articles</h2>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {post.relatedPosts.map((rp) => (
+          {relatedPosts.length > 0 ? relatedPosts.map((rp) => (
             <div
-              key={rp.title}
+              key={rp._id}
               className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
-              <img
-                src={rp.image}
-                alt={rp.title}
-                className="w-full h-48 object-cover"
-                loading="lazy"
-              />
+              {rp.image ? (
+                <img
+                  src={rp.image}
+                  alt={rp.title}
+                  className="w-full h-48 object-cover"
+                  loading="lazy"
+                />
+              ) : null}
 
               <div className="p-6">
                 <h3 className="font-semibold text-Dg mb-2">{rp.title}</h3>
-                <p className="text-Dg text-sm">{rp.date}</p>
+                <p className="text-Dg text-sm">{new Date(rp.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</p>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Comments */}
-        <div className="bg-white/30 rounded-3xl p-8 mt-12 shadow-lg">
-          <h2 className="text-2xl text-Dg font-bold mb-6">Comments</h2>
-
-          <textarea
-            placeholder="Share your thoughts..."
-            className="w-full p-3 rounded-xl border border-Dg focus:ring-2 focus:ring-Lg focus:border-transparent"
-            rows={3}
-          />
-
-          <button className="mt-4 bg-Mg text-white px-10 py-2 rounded-full hover:bg-Dg transition-colors">
-            Post Comment
-          </button>
+          )) : (
+            <div className="col-span-full bg-white/30 rounded-3xl p-8 text-center text-Dg shadow-lg">
+              More articles will appear here soon.
+            </div>
+          )}
         </div>
       </div>
     </div>

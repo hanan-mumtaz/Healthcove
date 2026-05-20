@@ -3,6 +3,7 @@ import API from '../services/api';
 import AuthContext from '../Authenticator/AuthContext';
 import { Star, Send, User as UserIcon } from 'lucide-react'; // Added UserIcon
 import { Link } from 'react-router-dom';
+import ParticleBackground from '../components/ParticleBackground';
 
 const ReviewsPage = () => {
   const auth = useContext(AuthContext);
@@ -48,7 +49,7 @@ const ReviewsPage = () => {
   };
 
   return (
-    <div className="pt-32 min-h-screen max-w-5xl mx-auto px-4 pb-12">
+    <div className="pt-32 min-h-screen max-w-5xl mx-auto px-4 pb-12"><ParticleBackground />
       <header className="mb-12">
         <h1 className="text-4xl font-bold text-center text-slate-900">
           Client <span className="text-Lg">Testimonials</span>

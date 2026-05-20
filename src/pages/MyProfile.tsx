@@ -1,22 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, MessageCircle, Heart, ShieldCheck, ChevronRight, User } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
 import { useAuth } from '../Authenticator/AuthContext';
+import API from '../services/api';
 
 const Profile = () => {
   const { user } = useAuth();
+  const [myBookings, setMyBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Mock Data for the client's own bookings
-  const [myBookings] = useState([
-    {
-      id: 1,
-      healthIssue: "PCOS / Hormonal Balance",
-      date: "April 10, 2026",
-      time: "10:30 AM",
-      status: "scheduled",
-      doctorNote: "Please bring your recent blood report for Vitamin D and LH/FSH."
-    }
-  ]);
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!user) {
+        setMyBookings([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const res = await API.get('/appointments/my-bookings');
+        setMyBookings(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error('Failed to load bookings', err);
+        setError('Your booking history could not be loaded right now.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [user]);
+
+  const formatDate = (value: string) => {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime())
+      ? value
+      : parsed.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 relative pt-24 pb-20">
@@ -30,12 +52,10 @@ const Profile = () => {
           <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-Mg to-Lg flex items-center justify-center text-white shadow-lg border-4 border-white overflow-hidden">
   {user?.picture || user?.photo ? (
     <img 
-  src={user.picture} 
+  src={user.picture || user.photo || ''} 
   alt="Profile" 
   className="w-full h-full object-cover" 
-  // ✅ This is the critical line to bypass the security block
   referrerPolicy="no-referrer" 
-  // ✅ This helps with Cross-Origin resource sharing
   crossOrigin="anonymous" 
 />
   ) : (
@@ -78,9 +98,17 @@ const Profile = () => {
               </span>
             </h2>
 
-            {myBookings.length > 0 ? (
+            {loading ? (
+              <div className="bg-white/30 backdrop-blur-sm p-12 rounded-[2.5rem] border-2 border-dashed border-slate-300 text-center text-slate-500 font-medium">
+                Loading your appointments...
+              </div>
+            ) : error ? (
+              <div className="bg-white/30 backdrop-blur-sm p-12 rounded-[2.5rem] border-2 border-dashed border-slate-300 text-center text-slate-500 font-medium">
+                {error}
+              </div>
+            ) : myBookings.length > 0 ? (
               myBookings.map((booking) => (
-                <div key={booking.id} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/60 shadow-2xl transition-all hover:translate-y-[-4px]">
+                <div key={booking._id || booking.id} className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/60 shadow-2xl transition-all hover:translate-y-[-4px]">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
@@ -109,7 +137,7 @@ const Profile = () => {
                       <Calendar className="w-6 h-6 text-Mg" />
                       <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</p>
-                        <p className="text-sm font-bold text-slate-800">{booking.date}</p>
+                        <p className="text-sm font-bold text-slate-800">{formatDate(booking.date)}</p>
                       </div>
                     </div>
                     <div className="bg-white/50 p-4 rounded-2xl border border-white/40 flex items-center gap-4">
@@ -122,7 +150,7 @@ const Profile = () => {
                   </div>
 
                   {/* Areej's Note for the Patient */}
-                  {booking.doctorNote && (
+                  {(booking.message || booking.doctorNote) && (
                     <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100 flex gap-4">
                       <div className="bg-Mg text-white p-2 h-fit rounded-lg shadow-sm">
                         <Heart className="w-4 h-4" />
@@ -130,7 +158,7 @@ const Profile = () => {
                       <div>
                         <p className="text-[10px] font-black text-Mg uppercase tracking-[0.2em] mb-1">Areej's Preparation Note</p>
                         <p className="text-sm text-slate-700 font-medium leading-relaxed italic">
-                          "{booking.doctorNote}"
+                          "{booking.message || booking.doctorNote}"
                         </p>
                       </div>
                     </div>
@@ -140,9 +168,9 @@ const Profile = () => {
             ) : (
               <div className="bg-white/30 backdrop-blur-sm p-12 rounded-[2.5rem] border-2 border-dashed border-slate-300 text-center">
                 <p className="text-slate-500 font-bold mb-4">You haven't booked any sessions yet.</p>
-                <button className="text-Mg font-black uppercase tracking-widest hover:text-slate-900 transition-all flex items-center gap-2 mx-auto">
+                <a href="#/bookconsultation" className="text-Mg font-black uppercase tracking-widest hover:text-slate-900 transition-all flex items-center gap-2 mx-auto justify-center">
                   Book First Slot <ChevronRight className="w-4 h-4" />
-                </button>
+                </a>
               </div>
             )}
           </div>

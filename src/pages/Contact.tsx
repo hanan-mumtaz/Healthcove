@@ -16,9 +16,9 @@ function Contact() {
     {
       icon: Mail,
       title: "Email",
-      details: ["contact@healthcove.com", "areej@healthcove.com"],
+      details: ["dn.areejfatima.1@gmail.com","contact@healthcove.com" ],
       action: "Send email",
-      link: "mailto:contact@healthcove.com"
+      link: "mailto:dn.areejfatima.1@gmail.com"
     },
     {
       icon: MapPin,

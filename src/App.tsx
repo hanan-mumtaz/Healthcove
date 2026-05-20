@@ -8,7 +8,6 @@ import {
 import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 
 import Services from './pages/Services';
-import BookConsultation from './pages/BookConsultation';
 import About from './pages/About';
 import Blog from './pages/Blog';
 import logo from './assets/images/logo.png';
@@ -23,6 +22,7 @@ import AdminLayout from './components/AdminLayout';
 import AdminBlogs from './Admin/AdminBlog';
 import AdminDashboard from './Admin/AdminDashboard';
 import AdminAppointments from './Admin/AdminAppointments';
+import AdminServices from './Admin/AdminServices';
 import { AuthProvider, useAuth } from './Authenticator/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import AuthContext from "./Authenticator/AuthContext";
@@ -34,6 +34,9 @@ import ReviewsPage from './pages/ReviewsPage';
 import API from './services/api';
 import AdminProfile from './Admin/AdminProfile';
 import ManageReviews from './Admin/ManageReviews';
+import ChatBot from './components/ChatBot';
+import MealPlanner from './pages/MealPlanner';
+import AppointmentScheduling from './pages/AppointmentScheduling';
 
 /* --- SCROLL TO TOP HELPER --- */
 function ScrollToTop() {
@@ -206,6 +209,8 @@ const Navigation = ({ isScrolled, isMobileMenuOpen, toggleMobileMenu, setIsMobil
             <Link to="/blog" className="text-Dg hover:text-Mg font-medium transition-colors">Blog</Link>
             <Link to="/contact" className="text-Dg hover:text-Mg font-medium transition-colors">Contact</Link>
             <Link to="/calculators" className="text-Dg hover:text-Mg font-medium transition-colors">Calculators</Link>
+            <Link to="/meal-planner" className="text-Dg hover:text-Mg font-medium transition-colors">Meal Planner</Link>
+            <Link to="/appointments" className="text-Dg hover:text-Mg font-medium transition-colors">Book Appointment</Link>
             
             {loading ? (
               <div className="w-20 h-8 bg-gray-200/50 animate-pulse rounded-full"></div>
@@ -257,6 +262,8 @@ const Navigation = ({ isScrolled, isMobileMenuOpen, toggleMobileMenu, setIsMobil
             <Link to="/blog" onClick={toggleMobileMenu} className="text-lg font-medium text-Dg hover:text-Mg">Blog</Link>
             <Link to="/contact" onClick={toggleMobileMenu} className="text-lg font-medium text-Dg hover:text-Mg">Contact</Link>
             <Link to="/calculators" onClick={toggleMobileMenu} className="text-lg font-medium text-Dg hover:text-Mg">Calculators</Link>
+            <Link to="/meal-planner" onClick={toggleMobileMenu} className="text-lg font-medium text-Dg hover:text-Mg">Meal Planner</Link>
+            <Link to="/appointments" onClick={toggleMobileMenu} className="text-lg font-medium text-Dg hover:text-Mg">Book Appointment</Link>
             <div className="w-full border-t border-gray-200 my-2"></div>
             {user ? (
               <div className="flex flex-col items-center space-y-4 w-full">
@@ -349,7 +356,7 @@ const AppContent = ({ isScrolled, isMobileMenuOpen, toggleMobileMenu, setIsMobil
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services />} />
-        <Route path="/bookconsultation" element={<BookConsultation />} />
+        <Route path="/bookconsultation" element={<AppointmentScheduling />} />
         <Route path="/services/:id" element={<ServiceDetail />} />
         <Route path="/about" element={<About />} />
         <Route path="/blog" element={<Blog />} />
@@ -362,17 +369,22 @@ const AppContent = ({ isScrolled, isMobileMenuOpen, toggleMobileMenu, setIsMobil
         <Route path="/calculators" element={<Calculators />} />
         <Route path="/booking-success" element={<BookingSuccess />} />
         <Route path="/reviews" element={<ReviewsPage />} />
+        <Route path="/meal-planner" element={<MealPlanner />} />
+        <Route path="/appointments" element={<AppointmentScheduling />} />
         
         <Route path="/admin" element={user?.role === 'admin' ? <AdminLayout /> : <Navigate to="/" />}>
           <Route index element={<AdminDashboard />} />
           <Route path="profile" element={<AdminProfile />} />
           <Route path="appointments" element={<AdminAppointments />} />
           <Route path="blogs" element={<AdminBlogs />} />
+          <Route path="services" element={<AdminServices />} />
           <Route path="reviews" element={<ManageReviews />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+
+      {!isAdminPath && <ChatBot />}
 
       {!isAdminPath && (
         <footer className="bg-white/10 text-slate-900 py-16 backdrop-blur-sm border-t border-white/20">
@@ -402,13 +414,13 @@ const AppContent = ({ isScrolled, isMobileMenuOpen, toggleMobileMenu, setIsMobil
                     <div className="p-2 bg-white/20 rounded-lg group-hover:bg-Mg group-hover:text-white transition-colors">
                       <Mail className="w-4 h-4" />
                     </div>
-                    <span className="group-hover:text-Mg">contact@healthcove.com</span>
+                    <span className="group-hover:text-Mg">dn.areejfatima.1@gmail.com</span>
                   </a>
-                  <a href="https://wa.me/923556403625" className="flex items-center space-x-3 group">
+                  <a href="https://wa.me/923491526911" className="flex items-center space-x-3 group">
                     <div className="p-2 bg-white/20 rounded-lg group-hover:bg-Mg group-hover:text-white transition-colors">
                       <MessageCircle className="w-4 h-4" />
                     </div>
-                    <span className="group-hover:text-Mg">+92 355 6403625</span>
+                    <span className="group-hover:text-Mg">+92 349 152 6911</span>
                   </a>
                 </div>
               </div>

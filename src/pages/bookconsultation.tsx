@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Mail, MessageCircle, AlertCircle } from "lucide-react"; 
 import { useNavigate } from "react-router-dom"; // 🆕 Import useNavigate
 import ParticleBackground from "../components/ParticleBackground";
@@ -19,6 +19,14 @@ const BookConsultation = () => {
     time: "",
     message: "",
   });
+
+  useEffect(() => {
+    setFormData((current) => ({
+      ...current,
+      name: user?.name || "",
+      email: user?.email || "",
+    }));
+  }, [user?.name, user?.email]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
