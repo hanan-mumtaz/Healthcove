@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "cross-env VITE_API_URL=https://healthcove-backend.vercel.app VITE_GOOGLE_CLIENT_ID=445381555299-unm29ovji6chbn5gklfqggkeae2q3nvb.apps.googleusercontent.com VITE_GEMINI_API_KEY=AIzaSyBRJ6zB2398izU8WkmwF5SXb00zBcoKfKU npm run build",
+    "predeploy": "cross-env VITE_API_URL=https://healthcove-backend.vercel.app VITE_GOOGLE_CLIENT_ID=445381555299-unm29ovji6chbn5gklfqggkeae2q3nvb.apps.googleusercontent.com VITE_GEMINI_API_KEY=AIzaSyA5ECXmUkLkH9mjAExa88NMMsUIGaQnzPY npm run build",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
