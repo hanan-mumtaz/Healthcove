@@ -7,6 +7,7 @@ import {
   Twitter,
   Linkedin,
   ArrowLeft,
+  Share2,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import ParticleBackground from "../components/ParticleBackground";
@@ -76,7 +77,7 @@ function SingleBlog() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative pt-16 flex items-center justify-center">
         <ParticleBackground />
-        <div className="relative z-10 text-slate-700 font-medium">Loading article...</div>
+        <div className="relative z-10 text-Mg font-bold text-xl animate-pulse">Loading article...</div>
       </div>
     );
   }
@@ -85,10 +86,11 @@ function SingleBlog() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative pt-16 flex items-center justify-center">
         <ParticleBackground />
-        <div className="relative z-10 max-w-xl mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold text-slate-900 mb-4">Article unavailable</h1>
+        <div className="relative z-10 max-w-xl mx-auto px-4 text-center bg-white/60 backdrop-blur-md p-10 rounded-3xl shadow-xl">
+          <h1 className="text-3xl font-bold text-Dg mb-4">Article unavailable</h1>
           <p className="text-slate-600 mb-8">{error || 'The requested article could not be found.'}</p>
-          <Link to="/blog" className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-gradient-to-r from-Mg to-Lg text-white font-bold">
+          <Link to="/blog" className="inline-flex items-center justify-center px-8 py-3 rounded-xl bg-gradient-to-r from-Mg to-Lg text-white font-bold hover:shadow-lg transition-all">
+            <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Blog
           </Link>
         </div>
@@ -97,129 +99,136 @@ function SingleBlog() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative pt-16">
-      {/* Background */}
-      <div className="absolute inset-0 z-0">
-        <div className="animated-background" />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative pt-16 pb-20">
+      <div className="animated-background" />
       <ParticleBackground />
 
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         
-        {/* Back Button */}
+        {/* Top Navigation */}
         <Link
           to="/blog"
-          className="inline-flex items-center text-Lg font-semibold hover:text-Mg transition-colors mb-6"
+          className="inline-flex items-center text-Mg font-bold hover:text-Lg transition-colors mb-8 group bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm"
         >
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Blog
+          <ArrowLeft className="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" />
+          Back to Articles
         </Link>
 
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-Mg">
+        {/* Hero Section */}
+        <div className="text-center mb-10">
+          <div className="flex justify-center flex-wrap gap-2 mb-6">
+            {tags.map((tag: string) => (
+              <span key={tag} className="bg-gradient-to-r from-Mg to-Lg text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm">
+                {tag}
+              </span>
+            ))}
+          </div>
+          
+          <h1 className="text-3xl md:text-3xl lg:text-4xl font-bold text-Dg leading-tight mb-8">
             {post.title}
           </h1>
 
-          <div className="flex flex-wrap items-center text-Dg gap-4 mt-4">
-            <span className="flex items-center">
-              <User className="w-4 h-4 mr-2" />
+          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8 text-sm font-medium text-slate-600">
+            <div className="flex items-center bg-white/60 px-4 py-2 rounded-full shadow-sm">
+              <User className="w-4 h-4 text-Mg mr-2" />
               {post.author?.name || post.author?.displayName || 'Areej Fatima'}
-            </span>
-
-            <span className="flex items-center">
-              <Calendar className="w-4 h-4 mr-2" />
-              {new Date(post.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
-            </span>
-
-            <span className="flex items-center">
-              <Clock className="w-4 h-4 mr-2" />
+            </div>
+            <div className="flex items-center bg-white/60 px-4 py-2 rounded-full shadow-sm">
+              <Calendar className="w-4 h-4 text-Mg mr-2" />
+              {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </div>
+            <div className="flex items-center bg-white/60 px-4 py-2 rounded-full shadow-sm">
+              <Clock className="w-4 h-4 text-Mg mr-2" />
               {post.readTime || '5 min read'}
-            </span>
+            </div>
           </div>
         </div>
 
-        {/* Image */}
-        <div className="rounded-3xl overflow-hidden shadow-xl mb-10">
-          {post.image ? (
+        {/* Featured Image */}
+        {post.image && (
+          <div className="w-full rounded-[2rem] overflow-hidden shadow-2xl relative z-10 mb-[-4rem]">
             <img
               src={post.image}
               alt={post.title}
-              className="w-full h-[450px] object-cover"
+              className="w-full h-[400px] md:h-[500px] object-cover hover:scale-105 transition-transform duration-700"
               loading="lazy"
             />
-          ) : null}
-        </div>
+          </div>
+        )}
 
-        {/* Content */}
-        <div className="prose prose-lg max-w-none text-Dg mb-10">
-          <div className="whitespace-pre-line leading-8 text-lg">{post.content}</div>
-        </div>
+        {/* Main Content Card */}
+        <div className="bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-xl p-8 sm:p-12 md:p-16 relative z-20 border border-white">
+          
+          {/* Formatted Article Body */}
+          <div className="prose prose-lg prose-emerald max-w-none text-slate-700 space-y-6 text-lg leading-relaxed mb-12">
+            {post.content.split('\n').map((paragraph: string, index: number) => {
+              if (!paragraph.trim()) return null;
+              return <p key={index}>{paragraph}</p>;
+            })}
+          </div>
 
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-10">
-          {tags.map((tag: string) => (
-            <span
-              key={tag}
-              className="bg-violet-100 text-Lg px-3 py-1 rounded-full text-sm"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Social Share */}
-        <div className="border-t border-b border-Lg py-6 flex justify-between items-center mb-10">
-          <span className="text-Dg">Share this article:</span>
-
-          <div className="flex space-x-4">
-            {[
-              { Icon: Facebook, platform: 'facebook' as const },
-              { Icon: Twitter, platform: 'twitter' as const },
-              { Icon: Linkedin, platform: 'linkedin' as const },
-            ].map(({ Icon, platform }) => (
-              <button
-                key={platform}
-                type="button"
-                onClick={() => handleShare(platform)}
-                className="text-Dg hover:text-Lg transition-colors"
-              >
-                <Icon className="w-5 h-5" />
-              </button>
-            ))}
+          {/* Share Section */}
+          <div className="border-t border-emerald-100 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h3 className="text-Dg font-bold flex items-center gap-2">
+              <Share2 className="w-5 h-5 text-Mg" />
+              Share this article
+            </h3>
+            <div className="flex space-x-3">
+              {[
+                { Icon: Facebook, platform: 'facebook', color: 'hover:bg-blue-600 hover:border-blue-600 hover:text-white' },
+                { Icon: Twitter, platform: 'twitter', color: 'hover:bg-sky-500 hover:border-sky-500 hover:text-white' },
+                { Icon: Linkedin, platform: 'linkedin', color: 'hover:bg-blue-700 hover:border-blue-700 hover:text-white' },
+              ].map(({ Icon, platform, color }) => (
+                <button
+                  key={platform}
+                  type="button"
+                  onClick={() => handleShare(platform as any)}
+                  className={`w-10 h-10 rounded-full border-2 border-emerald-100 flex items-center justify-center text-slate-500 transition-all duration-300 ${color}`}
+                  aria-label={`Share on ${platform}`}
+                >
+                  <Icon className="w-4 h-4" />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Related Posts */}
-        <h2 className="text-2xl text-Dg font-semibold mb-6">Related Articles</h2>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {relatedPosts.length > 0 ? relatedPosts.map((rp) => (
-            <div
-              key={rp._id}
-              className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
-            >
-              {rp.image ? (
-                <img
-                  src={rp.image}
-                  alt={rp.title}
-                  className="w-full h-48 object-cover"
-                  loading="lazy"
-                />
-              ) : null}
-
-              <div className="p-6">
-                <h3 className="font-semibold text-Dg mb-2">{rp.title}</h3>
-                <p className="text-Dg text-sm">{new Date(rp.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-              </div>
+        {/* Related Posts Section */}
+        {relatedPosts.length > 0 && (
+          <div className="mt-20">
+            <h2 className="text-2xl md:text-3xl font-bold text-Dg mb-8 text-center">Read Next</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {relatedPosts.map((rp) => (
+                <Link
+                  to={`/blog/${rp._id}`}
+                  key={rp._id}
+                  className="group bg-white/60 backdrop-blur-sm rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/50 flex flex-col"
+                >
+                  {rp.image && (
+                    <div className="overflow-hidden h-56">
+                      <img
+                        src={rp.image}
+                        alt={rp.title}
+                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6 flex-1 flex flex-col">
+                    <h3 className="font-bold text-xl text-Dg mb-3 group-hover:text-Mg transition-colors line-clamp-2">
+                      {rp.title}
+                    </h3>
+                    <div className="mt-auto flex items-center justify-between text-sm text-slate-500">
+                      <span className="font-medium text-Mg">{rp.category}</span>
+                      <span>{new Date(rp.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
-          )) : (
-            <div className="col-span-full bg-white/30 rounded-3xl p-8 text-center text-Dg shadow-lg">
-              More articles will appear here soon.
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

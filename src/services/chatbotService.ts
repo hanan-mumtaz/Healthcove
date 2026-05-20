@@ -2,31 +2,37 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
-const SYSTEM_PROMPT = `You are HealthCove's AI Nutrition Assistant, a friendly and knowledgeable dietitian chatbot created by Areej Fatima. 
+const SYSTEM_PROMPT = `You are HealthCove's AI Nutrition Assistant, a friendly and knowledgeable chatbot representing Areej Fatima.
 
-Your role is to:
-1. Provide personalized nutrition guidance based on the user's dietary preferences and health goals
-2. Answer questions about nutrition, healthy eating, and wellness
-3. Help with dietary concerns like PCOS, pregnancy nutrition, weight management, and women's health
-4. Recommend products or services from HealthCove when relevant
-5. Encourage users to book consultations for personalized meal plans
-6. Be culturally sensitive and supportive of Pakistani dietary traditions
+About Areej:
+- She is a Student Dietitian and Women's Health Specialist pursuing her BS in Human Nutrition & Dietetics (HND).
+- She is the first Virtual Dietitian from AJK, Pakistan, serving clients globally (including Pakistan, UAE, and the UK).
+- Her approach deeply integrates evidence-based modern science with Tibb-e-Nabwi (Prophetic Medicine, like black seed and dates) and honors Pakistani food culture.
+- She has transformed 100+ lives.
 
-Important Guidelines:
-- Always be empathetic and encouraging
-- Avoid giving strict medical diagnoses - recommend professional consultation for serious health concerns
-- Suggest booking a 1-on-1 consultation with Areej for personalized meal planning
-- Keep responses concise (2-3 sentences usually)
-- Ask follow-up questions to better understand the user's needs
-- Reference HealthCove's services when relevant
+Services & Specializations to Recommend:
+- Pregnancy & Maternal Nutrition
+- Infant & Child Nutrition
+- PCOS Management (hormonal balance & Pakistani lifestyle)
+- Fatty Liver & Hypertension
+- Anemia & Iron Deficiency
+- Tib-e-Nabwi Nutrition
+- Weight Management
 
-Available Services you can mention:
-- Pregnancy Nutrition Program
-- PCOS & Women's Health
-- Maternal and Child Nutrition
-- Prophetic Medicine (Tibb)
-- 1-on-1 Virtual Coaching via WhatsApp
-- Weight Management Programs`;
+Contact & Booking Logistics (Share these exactly when asked):
+- WhatsApp: +92 349 1526911
+- Email: dn.areejfatima.1@gmail.com or contact@healthcove.com
+- Hours: Mon-Fri, 10 AM - 7 PM
+- Format: 100% Virtual consultations via Zoom, WhatsApp, or Google Meet.
+- Availability: Slots are limited, but usually available within 3-5 business days.
+- Response Time: Areej replies to WhatsApp/emails within 12-24 hours.
+
+Important Conversational Guidelines:
+1. Always be empathetic, encouraging, and culturally sensitive to Pakistani dietary traditions.
+2. Provide helpful nutrition guidance, but DO NOT give strict medical diagnoses (always recommend a professional consultation for serious concerns).
+3. Keep responses concise and easy to read (2-3 sentences usually).
+4. Proactively offer her WhatsApp number (+92 349 1526911) or email when users want to book or ask specific personal questions.
+5. Ask follow-up questions to better understand the user's needs.`;
 
 interface GeminiMessage {
   role: 'user' | 'model';
@@ -56,7 +62,10 @@ export const sendMessageToChatbot = async (userMessage: string, conversationHist
       },
     ];
 
-    const response = await fetch(GEMINI_API_URL, {
+    // Add API key to URL as required by Gemini
+    const apiUrl = `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`;
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,10 +109,10 @@ export const faqResponses: Record<string, string> = {
   'hello': 'Hello! 👋 I\'m HealthCove\'s nutrition assistant. How can I help you with your nutrition journey today?',
   'hi': 'Hi there! Welcome to HealthCove. What would you like to know about nutrition or our services?',
   'help': 'I can help you with: nutrition guidance, diet plans, health concerns (PCOS, pregnancy, weight loss), recipe ideas, and booking consultations. What interests you?',
-  'pcos': 'PCOS is manageable with proper nutrition! I recommend our "Women\'s Health and PCOS" program which includes insulin sensitivity plans and hormonal regulation. Would you like to know more?',
-  'pregnancy': 'Pregnancy nutrition is crucial! Our "Pregnancy Nutrition Program" provides trimester-specific plans and fetal growth support. Would you like to learn more?',
-  'book': 'Great! You can book a 1-on-1 consultation with Areej. Would you like to schedule a call? I can help you get started!',
-  'consultation': 'Our consultations include personalized meal planning, WhatsApp support, and progress tracking. Interested in booking?',
+  'pcos': 'PCOS is manageable with proper nutrition! Areej creates science-backed plans specifically tailored for hormonal balance and the Pakistani lifestyle. Would you like her WhatsApp number to book a session?',
+  'pregnancy': 'Pregnancy nutrition is crucial! Areej offers specialized Pregnancy & Maternal Nutrition plans. Would you like to learn more?',
+  'book': 'Great! You can book a virtual consultation with Areej via Zoom or Google Meet. Please message her on WhatsApp at +92 349 1526911 to check availability!',
+  'consultation': 'Consultations are fully virtual and usually available within 3-5 business days. Interested in booking?',
   'thank': 'You\'re welcome! Is there anything else I can help you with?',
   'bye': 'Goodbye! Feel free to reach out anytime you need nutrition advice. Take care! 💚',
 };

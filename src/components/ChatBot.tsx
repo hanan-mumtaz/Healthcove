@@ -82,36 +82,42 @@ export default function ChatBot() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    // FIX 1: Changed right-6 to right-4 on mobile to prevent overflow
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[60] flex flex-col items-end gap-3">
+      
       {/* Chatbot Window */}
       {isOpen && (
-        <div className="mb-4 w-96 max-w-md bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/40 flex flex-col h-96 md:h-[500px]">
+        // FIX 2: Replaced 90vw with calc(100vw-2rem) to perfectly align with the right-4 margin
+        // FIX 3: Replaced 70vh with dvh (Dynamic Viewport Height) to respect mobile browser UI bars
+        <div className="w-[calc(100vw-2rem)] sm:w-96 max-w-sm bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/40 flex flex-col h-[calc(100dvh-8rem)] sm:h-[500px] max-h-[600px] overflow-hidden">
+          
           {/* Header */}
-          <div className="bg-gradient-to-r from-Mg to-Lg text-white p-4 rounded-t-2xl flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5" />
-              <span className="font-bold">HealthCove Assistant</span>
+          <div className="bg-gradient-to-r from-Mg to-Lg text-white p-4 rounded-t-2xl flex items-center justify-between flex-shrink-0 gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <MessageCircle className="w-5 h-5 flex-shrink-0" />
+              <span className="font-bold truncate text-sm sm:text-base">HealthCove Assistant</span>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="hover:bg-white/20 p-1 rounded-lg transition-all"
+              className="hover:bg-white/20 p-2 -mr-2 rounded-lg transition-all flex-shrink-0"
+              aria-label="Close chat"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-emerald-50/30 to-transparent">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-emerald-50/30 to-transparent">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs px-4 py-2 rounded-lg text-sm ${
+                  className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm sm:text-base leading-relaxed ${
                     message.role === 'user'
-                      ? 'bg-Mg text-white rounded-br-none'
-                      : 'bg-white border border-emerald-100 text-slate-900 rounded-bl-none'
+                      ? 'bg-Mg text-white rounded-br-sm'
+                      : 'bg-white border border-emerald-100 text-slate-900 rounded-bl-sm shadow-sm'
                   }`}
                 >
                   {message.content}
@@ -120,7 +126,7 @@ export default function ChatBot() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white border border-emerald-100 px-4 py-2 rounded-lg rounded-bl-none">
+                <div className="bg-white border border-emerald-100 px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm">
                   <Loader2 className="w-4 h-4 animate-spin text-Mg" />
                 </div>
               </div>
@@ -131,22 +137,24 @@ export default function ChatBot() {
           {/* Input Form */}
           <form
             onSubmit={handleSendMessage}
-            className="border-t border-emerald-100 p-3 bg-white/50 rounded-b-2xl flex gap-2"
+            className="border-t border-emerald-100 p-3 bg-white/90 rounded-b-2xl flex gap-2 flex-shrink-0 items-end shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
           >
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Ask about nutrition..."
-              className="flex-1 px-3 py-2 bg-white/80 border border-emerald-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-Mg/50 placeholder-slate-400"
+              // FIX 4: Changed text-xs to text-base (16px) to PREVENT iOS Safari auto-zoom
+              className="flex-1 px-4 py-3 bg-white border border-emerald-100 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-Mg/50 placeholder-slate-400"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={isLoading || !inputValue.trim()}
-              className="bg-Mg hover:bg-Lg disabled:opacity-50 text-white p-2 rounded-lg transition-colors"
+              // FIX 5: Better touch target padding for mobile devices
+              className="bg-Mg hover:bg-Lg disabled:opacity-50 text-white p-3 rounded-xl transition-colors flex-shrink-0"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-5" />
             </button>
           </form>
         </div>
@@ -155,14 +163,20 @@ export default function ChatBot() {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-gradient-to-br from-Mg to-Lg hover:shadow-lg transform hover:scale-110 text-white p-4 rounded-full shadow-xl transition-all duration-300 flex items-center justify-center"
+        className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-Mg to-Lg hover:shadow-lg transform hover:scale-110 text-white rounded-full shadow-2xl transition-all duration-300 flex items-center justify-center flex-shrink-0 relative group"
+        title={isOpen ? "Close chat" : "Chat with us"}
       >
         {isOpen ? (
           <X className="w-6 h-6" />
         ) : (
           <div className="relative">
             <MessageCircle className="w-6 h-6" />
-            <span className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+            <span className="absolute top-0 right-0 w-3 h-3 bg-emerald-300 border-2 border-Mg rounded-full animate-pulse" />
+          </div>
+        )}
+        {!isOpen && (
+          <div className="hidden sm:block absolute bottom-full right-0 mb-2 bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Chat with us!
           </div>
         )}
       </button>

@@ -104,7 +104,7 @@ function Services() {
       <ParticleBackground />
 
       {/* HERO SECTION */}
-      <section className="relative py-20">
+      <section className="relative py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Our <span className="text-Mg">Programs</span>

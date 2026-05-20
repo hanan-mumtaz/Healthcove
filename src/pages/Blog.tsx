@@ -73,7 +73,7 @@ function Blog() {
   const gridPosts = useMemo(() => posts.filter((post) => post._id !== featuredPost?._id), [posts, featuredPost]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 relative pt-24 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 relative pt-16 pb-20">
       <div className="animated-background" />
       <ParticleBackground />
 

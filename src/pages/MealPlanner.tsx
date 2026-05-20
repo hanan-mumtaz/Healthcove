@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Utensils, Brain, Heart, Zap, Download, Share2 } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
 
+// --- Types & Interfaces ---
 interface MealPlan {
   day: string;
   meals: {
@@ -20,79 +21,67 @@ interface UserPreferences {
   healthCondition: string;
 }
 
-const SAMPLE_MEAL_PLANS: Record<string, MealPlan> = {
-  day1: {
-    day: 'Monday',
-    meals: {
-      breakfast: {
-        name: 'Oatmeal with Berries & Almonds',
-        calories: 350,
-        protein: 12,
-        carbs: 45,
-        fats: 10,
-      },
-      lunch: {
-        name: 'Grilled Chicken with Brown Rice & Vegetables',
-        calories: 550,
-        protein: 40,
-        carbs: 55,
-        fats: 12,
-      },
-      dinner: {
-        name: 'Baked Salmon with Sweet Potato & Broccoli',
-        calories: 480,
-        protein: 35,
-        carbs: 50,
-        fats: 15,
-      },
-      snacks: {
-        name: 'Greek Yogurt with Honey',
-        calories: 150,
-        protein: 15,
-        carbs: 20,
-        fats: 2,
-      },
-    },
-  },
-  day2: {
-    day: 'Tuesday',
-    meals: {
-      breakfast: {
-        name: 'Scrambled Eggs with Whole Wheat Toast',
-        calories: 320,
-        protein: 16,
-        carbs: 38,
-        fats: 10,
-      },
-      lunch: {
-        name: 'Lentil Soup with Roasted Vegetables',
-        calories: 420,
-        protein: 18,
-        carbs: 60,
-        fats: 8,
-      },
-      dinner: {
-        name: 'Turkey Meatballs with Whole Wheat Pasta',
-        calories: 500,
-        protein: 38,
-        carbs: 52,
-        fats: 11,
-      },
-      snacks: {
-        name: 'Mixed Nuts & Dried Fruits',
-        calories: 180,
-        protein: 6,
-        carbs: 22,
-        fats: 9,
-      },
-    },
-  },
+// --- AI Service Function ---
+// You can keep this here or move it to your chatbotService file!
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+
+const generateMealPlanWithAI = async (preferences: UserPreferences): Promise<MealPlan[]> => {
+  const prompt = `
+    You are an expert clinical dietitian. Generate a 3-day meal plan based on these exact parameters:
+    - Goal: ${preferences.dietaryGoal}
+    - Daily Calories: ${preferences.calorieTarget} kcal
+    - Cuisine: ${preferences.cuisinePreference}
+    - Health Condition: ${preferences.healthCondition}
+    - Allergies: ${preferences.allergies.length > 0 ? preferences.allergies.join(', ') : 'None'}
+
+    Ensure the meals are authentic to the requested cuisine and medically appropriate for the health condition.
+    Ensure the daily total calories sum up closely to exactly ${preferences.calorieTarget} kcal.
+
+    You MUST return ONLY a raw JSON array of objects. Do not include markdown formatting, backticks, or any conversational text.
+    The JSON must strictly match this structure:
+    [
+      {
+        "day": "Day 1",
+        "meals": {
+          "breakfast": { "name": "string", "calories": number, "protein": number, "carbs": number, "fats": number },
+          "lunch": { "name": "string", "calories": number, "protein": number, "carbs": number, "fats": number },
+          "dinner": { "name": "string", "calories": number, "protein": number, "carbs": number, "fats": number },
+          "snacks": { "name": "string", "calories": number, "protein": number, "carbs": number, "fats": number }
+        }
+      }
+    ]
+  `;
+
+  try {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.2 }, // Low temp for accurate JSON and math
+      }),
+    });
+
+    const data = await response.json();
+    let jsonString = data.candidates[0].content.parts[0].text;
+    
+    // Clean up markdown backticks if AI includes them
+    jsonString = jsonString.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error("Failed to generate meal plan:", error);
+    throw new Error("Failed to generate meal plan");
+  }
 };
 
+// --- Components ---
 const PreferenceForm: React.FC<{
   onSubmit: (prefs: UserPreferences) => void;
   isLoading: boolean;
-}> = ({ onSubmit, isLoading }) => {
+  loadingText: string;
+}> = ({ onSubmit, isLoading, loadingText }) => {
   const [preferences, setPreferences] = useState<UserPreferences>({
     dietaryGoal: 'weight-loss',
     allergies: [],
@@ -230,18 +219,18 @@ const PreferenceForm: React.FC<{
         disabled={isLoading}
         className="w-full bg-gradient-to-r from-Mg to-Lg hover:shadow-lg disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all duration-300"
       >
-        {isLoading ? 'Generating Your Meal Plan...' : 'Generate My Meal Plan'}
+        {isLoading ? loadingText : 'Generate My Meal Plan'}
       </button>
     </form>
   );
 };
 
 const MealCard: React.FC<{ meal: any; title: string }> = ({ meal, title }) => {
-  const totalCalories = meal.calories;
+  if (!meal) return null;
   return (
-    <div className="bg-white/75 backdrop-blur-md rounded-xl border border-white/40 p-4 shadow-md hover:shadow-lg transition-all">
+    <div className="bg-white/75 backdrop-blur-md rounded-xl border border-white/40 p-4 shadow-md hover:shadow-lg transition-all flex flex-col h-full">
       <h4 className="font-bold text-Mg text-sm mb-2">{title}</h4>
-      <p className="text-slate-900 font-semibold text-sm mb-3">{meal.name}</p>
+      <p className="text-slate-900 font-semibold text-sm mb-4 flex-grow">{meal.name}</p>
       <div className="grid grid-cols-2 gap-2 text-xs">
         <div className="bg-emerald-50 rounded-lg p-2">
           <p className="text-slate-600 font-medium">Calories</p>
@@ -267,16 +256,44 @@ const MealCard: React.FC<{ meal: any; title: string }> = ({ meal, title }) => {
 export default function MealPlanner() {
   const [step, setStep] = useState<'form' | 'results'>('form');
   const [isLoading, setIsLoading] = useState(false);
-  const [generatedPlan, setGeneratedPlan] = useState<UserPreferences | null>(null);
+  const [loadingText, setLoadingText] = useState('Generating Your Meal Plan...');
+  const [generatedPrefs, setGeneratedPrefs] = useState<UserPreferences | null>(null);
+  const [generatedMeals, setGeneratedMeals] = useState<MealPlan[]>([]);
+
+  // Rotating loading text effect
+  useEffect(() => {
+    if (!isLoading) return;
+    
+    const texts = [
+      "Analyzing preferences...",
+      "Calculating perfect macros...",
+      "Cooking up your menu...",
+      "Finalizing details..."
+    ];
+    let i = 0;
+    
+    const interval = setInterval(() => {
+      i = (i + 1) % texts.length;
+      setLoadingText(texts[i]);
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [isLoading]);
 
   const handleGeneratePlan = async (preferences: UserPreferences) => {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setGeneratedPlan(preferences);
+    setGeneratedPrefs(preferences);
+    setLoadingText("Analyzing preferences...");
+    
+    try {
+      const aiGeneratedPlan = await generateMealPlanWithAI(preferences);
+      setGeneratedMeals(aiGeneratedPlan);
       setStep('results');
+    } catch (error) {
+      alert("Sorry, we couldn't generate your plan right now. Please check your API key or try again.");
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -291,14 +308,18 @@ export default function MealPlanner() {
               Meal <span className="text-Mg bg-gradient-to-r from-Mg to-Lg bg-clip-text text-transparent">Planner</span>
             </h1>
             <p className="text-lg text-Dg opacity-90 max-w-2xl mx-auto">
-              Get a personalized 7-day meal plan tailored to your dietary goals, health conditions, and food preferences. All meals are culturally appropriate and delicious!
+              Get a personalized 3-day meal plan tailored to your dietary goals, health conditions, and food preferences. All meals are culturally appropriate and delicious!
             </p>
           </div>
 
           {step === 'form' ? (
             // Form Step
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/40">
-              <PreferenceForm onSubmit={handleGeneratePlan} isLoading={isLoading} />
+              <PreferenceForm 
+                onSubmit={handleGeneratePlan} 
+                isLoading={isLoading} 
+                loadingText={loadingText} 
+              />
             </div>
           ) : (
             // Results Step
@@ -309,25 +330,25 @@ export default function MealPlanner() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-white/60 rounded-lg p-3">
                     <p className="text-xs text-slate-600 mb-1">Daily Calories</p>
-                    <p className="text-xl font-bold text-Mg">{generatedPlan?.calorieTarget}</p>
+                    <p className="text-xl font-bold text-Mg">~{generatedPrefs?.calorieTarget}</p>
                   </div>
                   <div className="bg-white/60 rounded-lg p-3">
                     <p className="text-xs text-slate-600 mb-1">Goal</p>
-                    <p className="text-lg font-bold text-Dg capitalize">{generatedPlan?.dietaryGoal.replace('-', ' ')}</p>
+                    <p className="text-lg font-bold text-Dg capitalize">{generatedPrefs?.dietaryGoal.replace('-', ' ')}</p>
                   </div>
                   <div className="bg-white/60 rounded-lg p-3">
                     <p className="text-xs text-slate-600 mb-1">Cuisine</p>
-                    <p className="text-lg font-bold text-Dg capitalize">{generatedPlan?.cuisinePreference}</p>
+                    <p className="text-lg font-bold text-Dg capitalize">{generatedPrefs?.cuisinePreference}</p>
                   </div>
                   <div className="bg-white/60 rounded-lg p-3">
-                    <p className="text-xs text-slate-600 mb-1">Duration</p>
-                    <p className="text-lg font-bold text-Dg">7 Days</p>
-                  </div>
+  <p className="text-xs text-slate-600 mb-1">Duration</p>
+  <p className="text-lg font-bold text-Dg">1-Day Sample</p>
+</div>
                 </div>
               </div>
 
-              {/* Meal Days */}
-              {Object.values(SAMPLE_MEAL_PLANS).map((dayPlan, idx) => (
+              {/* Dynamic AI Meal Days */}
+              {generatedMeals.map((dayPlan, idx) => (
                 <div key={idx} className="bg-white/75 backdrop-blur-md rounded-2xl shadow-xl border border-white/40 p-6">
                   <h3 className="text-2xl font-bold text-Dg mb-6">{dayPlan.day}</h3>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -340,7 +361,7 @@ export default function MealPlanner() {
               ))}
 
               {/* Action Buttons */}
-              <div className="flex gap-4 justify-center">
+              <div className="flex flex-wrap gap-4 justify-center">
                 <button
                   onClick={() => setStep('form')}
                   className="px-8 py-3 bg-white border-2 border-Mg text-Mg font-bold rounded-xl hover:bg-Mg/5 transition-all"

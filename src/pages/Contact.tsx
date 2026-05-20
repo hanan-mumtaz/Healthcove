@@ -68,22 +68,9 @@ function Contact() {
       <ParticleBackground />
 
       {/* WhatsApp Floating Button */}
-<a 
-  href="https://wa.me/923491526911" 
-  target="_blank" 
-  rel="noopener noreferrer"
-  className="fixed bottom-8 right-8 z-[100] bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center group border-4 border-white/20"
->
-  {/* The WhatsApp Icon */}
-  <MessageCircle className="w-7 h-7 fill-current" /> 
-  
-  {/* Hover Label */}
-  <span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-3 transition-all duration-500 font-bold whitespace-nowrap text-sm">
-    WhatsApp Me
-  </span>
-</a>
 
-      <div className="relative py-20">
+
+      <div className="relative py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Hero Section */}

@@ -52,7 +52,7 @@ const Calculators = () => {
       <div className="animated-background" />
       <ParticleBackground />
 
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section className="relative py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">

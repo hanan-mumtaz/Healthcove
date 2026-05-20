@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 // ✅ UPDATED: HashRouter is now imported and aliased as Router
 import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import Logos from './assets/images/IMG_55225s.png'; // Double check this path points to your logo file
 
 import Services from './pages/Services';
 import About from './pages/About';
@@ -16,8 +17,8 @@ import ParticleBackground from './components/ParticleBackground';
 import SingleBlog from './pages/SingleBlog';
 import ServiceDetail from './pages/ServiceDetail';
 import Contact from './pages/Contact';
-import SignUp from './pages/SignUp';
-import SignIn from './pages/SignIn';
+import SignIn from './pages/signin';
+import SignUp from './pages/signup';
 import AdminLayout from './components/AdminLayout';
 import AdminBlogs from './Admin/AdminBlog';
 import AdminDashboard from './Admin/AdminDashboard';
@@ -309,6 +310,24 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
+  // Preload reviews, services, and blogs on app startup
+  useEffect(() => {
+    const preloadData = async () => {
+      try {
+        // Preload reviews
+        await API.get('/reviews?t=' + Date.now());
+        // Preload services
+        await API.get('/services?public=true&t=' + Date.now());
+        // Preload blogs
+        await API.get('/blogs?public=true&t=' + Date.now());
+      } catch (err) {
+        // Silently fail - data will load on demand if preload fails
+        console.log('Preload completed');
+      }
+    };
+    preloadData();
+  }, []);
+
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
@@ -332,13 +351,33 @@ const AppContent = ({ isScrolled, isMobileMenuOpen, toggleMobileMenu, setIsMobil
   const { user, loading } = useAuth();
   const isAdminPath = location.pathname.startsWith('/admin');
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-violet-50">
-        <div className="w-12 h-12 border-4 border-Mg border-t-transparent rounded-full animate-spin"></div>
+  // Close mobile menu and reset scroll on location change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname, setIsMobileMenuOpen]);
+
+if (loading) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+      {/* Perspective wrapper for the 3D depth effect */}
+      <div style={{ perspective: '1000px' }} className="mb-0">
+        <img 
+          src={Logos} 
+          alt="HealthCove Loading..." 
+          className="w-36 h-36 animate-logo-flip drop-shadow-2xl"
+        />
       </div>
-    );
-  }
+      {/* Loading text with dots animation */}
+      <div className="flex items-center ">
+        <div className="flex gap-2">
+          <span className="w-2 h-2 bg-Mg rounded-full animate-bounce" style={{ animationDelay: '0s' }}></span>
+          <span className="w-2 h-2 bg-Mg rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+          <span className="w-2 h-2 bg-Mg rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 relative overflow-hidden">
