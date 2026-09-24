@@ -24,7 +24,7 @@ interface UserPreferences {
 // --- AI Service Function ---
 // You can keep this here or move it to your chatbotService file!
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 
 const generateMealPlanWithAI = async (preferences: UserPreferences): Promise<MealPlan[]> => {
   const prompt = `
