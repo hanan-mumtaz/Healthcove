@@ -1,7 +1,6 @@
 // Chatbot Service for Gemini AI Integration
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-
 const SYSTEM_PROMPT = `You are HealthCove's AI Nutrition Assistant, a friendly and knowledgeable chatbot representing Areej Fatima.
 
 About Areej:
@@ -83,8 +82,21 @@ export const sendMessageToChatbot = async (userMessage: string, conversationHist
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      console.error('Gemini API error:', error);
+      const errorBody = await response.json().catch(() => null);
+      console.error('Gemini API error:', response.status, errorBody);
+
+      if (response.status === 401 || response.status === 403) {
+        return 'The nutrition assistant is not authorized yet. Please check the Gemini API key configuration.';
+      }
+
+      if (response.status === 429) {
+        return 'The nutrition assistant is busy right now. Please try again shortly.';
+      }
+
+      if (response.status === 500 || response.status === 503) {
+        return 'The nutrition assistant is temporarily unavailable. Please try again shortly.';
+      }
+
       return 'Sorry, I encountered an error. Please try again.';
     }
 
