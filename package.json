@@ -10,7 +10,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "cross-env VITE_API_URL=https://healthcove-backend.vercel.app VITE_GOOGLE_CLIENT_ID=445381555299-unm29ovji6chbn5gklfqggkeae2q3nvb.apps.googleusercontent.com VITE_GEMINI_API_KEY= npm run build",
+    "predeploy": "cross-env VITE_API_URL=https://healthcove-backend.vercel.app VITE_GOOGLE_CLIENT_ID= VITE_GEMINI_API_KEY= npm run build",
     "deploy": "gh-pages -d dist --no-history"
   },
   "dependencies": {
